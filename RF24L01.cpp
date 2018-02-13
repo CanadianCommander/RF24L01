@@ -1,65 +1,6 @@
-#include <Arduino.h>
-#include "RF24L01.h"
-
-//SPI ----------------------------
-void initSPI();
-uint8_t transmitSPI(uint8_t msg);
-//////////////////////////////////
-// RF24L01 ----------------------
 #define CE_PIN PORTB1
 #define CSN_PIN PORTB2
-void initRF24L01();
-uint8_t writeRegRF24L01(uint8_t addr, uint8_t reg);
-uint8_t writeRegRF24L01(uint8_t addr, uint8_t * data, uint8_t len);
-uint8_t readRegRF24L01(uint8_t addr);
-uint8_t writeTxPayload(uint8_t data);
-uint8_t readRxPayload(uint8_t * buffer, uint8_t len);
-uint8_t writeTxPayload(uint8_t * data, uint8_t len);
-uint8_t getStatus();
-uint8_t flushRx();
-
-void powerUpRF24L01();
-void setTxAddress(uint8_t * addr, uint8_t len);
-void setRxAddress(uint8_t * addr, uint8_t len);
-void transmitRF24L01(uint8_t data);
-void receiveRF24L01(uint8_t * buffer, uint8_t len);
-uint8_t HasRxData();
-void listenForTransmission();
-void printStatus(uint8_t sReg);
-/////////////////////////////////
-
-
-uint8_t myAddr[5] = {0xB3,0xB4,0xB5,0xB6,0x05};
-void setup(){
-  Serial.begin(9600);
-  Serial.print("INIT....");
-  initSPI();
-  initRF24L01();
-  setRxAddress(myAddr, 5);
-  setTxAddress(myAddr,5);
-  listenForTransmission();
-  Serial.print("INIT Done\n");
-}
-
-uint8_t dataBuff[33];
-void loop(){
-  //delay(1000);
-  //transmitRF24L01(0);
-
-
-  delay(1000);
-  if(HasRxData()){
-    Serial.print("I have mail: ");
-    receiveRF24L01(dataBuff,33);
-    for(int i =0; i < 33; i ++){
-      Serial.print(dataBuff[i], BIN);
-      Serial.print(" ");
-    }
-    Serial.print("\n");
-  }
-  Serial.print(readRegRF24L01(RPD), BIN);
-}
-
+#include "RF24L01.h"
 
 void initSPI(){
   //clock and master out to output
@@ -87,7 +28,13 @@ void initRF24L01(){
   writeRegRF24L01(FEATURE,(1 << EN_DPL) | (1 << EN_ACK_PAY) | (1 << EN_DYN_ACK));
   writeRegRF24L01(DYNPD,(1 << DPL_P5) | (1 << DPL_P4) | (1 << DPL_P3) | (1 << DPL_P2) | (1 << DPL_P1) | (1 << DPL_P0));
   writeRegRF24L01(SETUP_RETR, (0xF << ARDa) | (0xF << ARC));
+  writeRegRF24L01(RF_CH,0x01);
+}
+
+void configRX(){
   writeRegRF24L01(EN_RXADDR, (1 << ERX_P5) | (1 << ERX_P4) | (1 << ERX_P3) | (1 << ERX_P2) | (1 << ERX_P1) | (1 << ERX_P0));
+  writeRegRF24L01(EN_AA, 0x1F);
+  listenForTransmission();
 }
 
 uint8_t writeRegRF24L01(uint8_t addr, uint8_t reg){
@@ -120,7 +67,7 @@ uint8_t readRxPayload(uint8_t * buffer, uint8_t len){
   uint8_t status = transmitSPI(R_RX_PAYLOAD);
 
   for(int i =0; i < len; i ++){
-    buffer[i] = transmitSPI(0x1);
+    buffer[i] = transmitSPI(0x0);
   }
   PORTB |= (1 << CSN_PIN);
   return status;
@@ -158,52 +105,58 @@ uint8_t flushRx(){
 
 
 void transmitRF24L01(uint8_t data){
+  transmitRF24L01(&data,1);
+}
+
+void transmitRF24L01(uint8_t * data, uint8_t len){
   //configure for transmit.
-  printStatus(writeRegRF24L01(CONFIG, 0xA));
-  printStatus(writeTxPayload(0xBB));
+  writeRegRF24L01(CONFIG, 0xA);
+  writeTxPayload(data,len);
 
   //transmit packet(s).
   PORTB |= (1 << CE_PIN);
-  delay(1000);
+  //wait for transmit finish
+  while(((getStatus() >> TX_DS) & 0x1) != 0x1){
+    if(((getStatus() >> MAX_RT) & 0x1) == 0x1){
+      break;
+    }
+  }
   PORTB &= ~(1 << CE_PIN);
+
+  //clear transmit complete & timeout status bit
+  writeRegRF24L01(STATUS, readRegRF24L01(STATUS) | ( 1 << TX_DS) | (1 << MAX_RT));
 }
 
 void receiveRF24L01(uint8_t * buffer, uint8_t len){
   readRxPayload(buffer,len);
+  //clear rcv status bit.
+  writeRegRF24L01(STATUS, readRegRF24L01(STATUS) | ( 1 << RX_DR));
 }
 
 void powerUpRF24L01(){
-  printStatus(writeRegRF24L01(CONFIG,0x02));
+  writeRegRF24L01(CONFIG,0x02);
 }
 
 void setTxAddress(uint8_t * addr, uint8_t len){
   writeRegRF24L01(TX_ADDR,addr,len);// transmit target
-  writeRegRF24L01(RX_ADDR_P0,addr,len);//rcv ack on pipe 0.
+  setRxAddress(addr,len);//rcv ack on pipe 0.
 }
 
 void setRxAddress(uint8_t * addr, uint8_t len){
-  writeRegRF24L01(RX_ADDR_P5,addr,len);
+  writeRegRF24L01(RX_ADDR_P0,addr,len);
+  writeRegRF24L01(RX_ADDR_P1,addr[len-1] + 1);
+  writeRegRF24L01(RX_ADDR_P2,addr[len-1] + 2);
+  writeRegRF24L01(RX_ADDR_P3,addr[len-1] + 3);
+  writeRegRF24L01(RX_ADDR_P4,addr[len-1] + 4);
+  writeRegRF24L01(RX_ADDR_P5,addr[len-1] + 5);
 }
 
 uint8_t HasRxData(){
   uint8_t status = getStatus();
-  printStatus(status);
   return ((status >> RX_P_NO) & 0x7) != 0x7;
 }
 
 void listenForTransmission(){
   writeRegRF24L01(CONFIG, 0xB);
   PORTB |= (1 << CE_PIN);
-}
-
-void printStatus(uint8_t sReg){
-  Serial.print(" Have RX data: ");
-  Serial.print((sReg >> RX_DR));
-  Serial.print(" TX data Sent: ");
-  Serial.print((sReg & 0x20) >> TX_DS);
-  Serial.print(" RX data backlog: ");
-  Serial.print((sReg & 0xE) >> 1);
-  Serial.print(" TX Full: ");
-  Serial.print((sReg & 0x1));
-  Serial.print("\n");
 }

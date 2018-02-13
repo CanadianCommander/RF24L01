@@ -1,3 +1,47 @@
+#ifndef RF24L01_H
+#define RF24L01_H
+
+#include <Arduino.h>
+
+//SPI ----------------------------
+extern void initSPI();
+extern uint8_t transmitSPI(uint8_t msg);
+//////////////////////////////////
+// RF24L01 ----------------------
+#ifndef CE_PIN
+#warning "CE Pin not defined defaulting to .... PORTB1"
+#define CE_PIN PORTB1
+#endif
+
+#ifndef CSN_PIN
+#warning "CSN Pin not defined defaulting to .... PORTB2"
+#define CSN_PIN PORTB2
+#endif
+
+
+
+void initRF24L01();
+void configRX();
+extern uint8_t writeRegRF24L01(uint8_t addr, uint8_t reg);
+extern uint8_t writeRegRF24L01(uint8_t addr, uint8_t * data, uint8_t len);
+extern uint8_t readRegRF24L01(uint8_t addr);
+extern uint8_t writeTxPayload(uint8_t data);
+extern uint8_t readRxPayload(uint8_t * buffer, uint8_t len);
+extern uint8_t writeTxPayload(uint8_t * data, uint8_t len);
+extern uint8_t getStatus();
+extern uint8_t flushRx();
+
+extern void powerUpRF24L01();
+extern void setTxAddress(uint8_t * addr, uint8_t len);
+extern void setRxAddress(uint8_t * addr, uint8_t len);
+extern void transmitRF24L01(uint8_t data);
+extern void transmitRF24L01(uint8_t * data, uint8_t len);
+extern void receiveRF24L01(uint8_t * buffer, uint8_t len);
+extern uint8_t HasRxData();
+extern void listenForTransmission();
+extern void printStatus(uint8_t sReg);
+/////////////////////////////////
+
 //commands
 #define R_REGISTER(reg) reg & 0x1F
 #define W_REGISTER(reg) (reg & 0x1F) | 0x20
@@ -102,3 +146,5 @@
 #define EN_DPL 2
 #define EN_ACK_PAY 1
 #define EN_DYN_ACK 0
+
+#endif // RF24L01_H
