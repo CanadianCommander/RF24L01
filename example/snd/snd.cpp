@@ -20,6 +20,11 @@ uint8_t dataBuff[33];
 void loop(){
   delay(1000);
   transmitRF24L01((uint8_t*)"HELLO WORLD", 12);
+  if(HasReceiveData()){
+    receiveRF24L01(dataBuff,32);
+    Serial.print((char*)dataBuff);
+    Serial.print("\n");
+  }
   printStatus(getStatus());
 }
 

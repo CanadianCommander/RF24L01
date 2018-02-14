@@ -22,7 +22,8 @@ void loop(){
   delay(1000);
   PORTB &= ~(1 << CE_PIN);
   delay(1);
-  if(HasRxData()){
+  if(HasReceiveData()){
+    setReceivedMsg(0,(uint8_t*)"YO!",4);
     Serial.print("I have mail: ");
     receiveRF24L01(dataBuff,33);
     Serial.print((char*)dataBuff);

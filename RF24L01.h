@@ -24,20 +24,30 @@ void initRF24L01();
 void configRX();
 extern uint8_t writeRegRF24L01(uint8_t addr, uint8_t reg);
 extern uint8_t writeRegRF24L01(uint8_t addr, uint8_t * data, uint8_t len);
-extern uint8_t readRegRF24L01(uint8_t addr);
 extern uint8_t writeTxPayload(uint8_t data);
-extern uint8_t readRxPayload(uint8_t * buffer, uint8_t len);
 extern uint8_t writeTxPayload(uint8_t * data, uint8_t len);
+extern uint8_t writeRxPayload(uint8_t pipe, uint8_t data);
+extern uint8_t writeRxPayload(uint8_t pipe, uint8_t * data, uint8_t len);
+
+extern uint8_t readRegRF24L01(uint8_t addr);
+extern uint8_t readRxPayload(uint8_t * buffer, uint8_t len);
+
 extern uint8_t getStatus();
 extern uint8_t flushRx();
 
 extern void powerUpRF24L01();
+
 extern void setTxAddress(uint8_t * addr, uint8_t len);
 extern void setRxAddress(uint8_t * addr, uint8_t len);
+
 extern void transmitRF24L01(uint8_t data);
 extern void transmitRF24L01(uint8_t * data, uint8_t len);
+
 extern void receiveRF24L01(uint8_t * buffer, uint8_t len);
-extern uint8_t HasRxData();
+extern void setReceivedMsg(uint8_t pipe, uint8_t data);
+extern void setReceivedMsg(uint8_t pipe, uint8_t * buffer, uint8_t len);
+
+extern uint8_t HasReceiveData();
 extern void listenForTransmission();
 extern void printStatus(uint8_t sReg);
 /////////////////////////////////
@@ -47,6 +57,7 @@ extern void printStatus(uint8_t sReg);
 #define W_REGISTER(reg) (reg & 0x1F) | 0x20
 #define R_RX_PAYLOAD 0x61
 #define W_TX_PAYLOAD 0xA0
+#define W_ACK_PAYLOAD(pipe) (pipe & 0x7) | 0xA8
 #define FLUSH_RX     0xE2
 #define NOP          0xFF
 

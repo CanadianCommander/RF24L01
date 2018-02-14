@@ -88,6 +88,20 @@ uint8_t writeTxPayload(uint8_t * data, uint8_t len){
   return status;
 }
 
+uint8_t writeRxPayload(uint8_t pipe, uint8_t data){
+  return writeRxPayload(pipe, &data,1);
+}
+
+uint8_t writeRxPayload(uint8_t pipe, uint8_t * data, uint8_t len){
+  PORTB &= ~(1 << CSN_PIN);
+  uint8_t status = transmitSPI(W_ACK_PAYLOAD(pipe));
+  for(uint8_t i = 0; i< len; i ++){
+    transmitSPI(*(data + i));
+  }
+  PORTB |= (1 << CSN_PIN);
+  return status;
+}
+
 uint8_t getStatus(){
   PORTB &= ~(1 << CSN_PIN);
   uint8_t status = transmitSPI(NOP);
@@ -133,6 +147,14 @@ void receiveRF24L01(uint8_t * buffer, uint8_t len){
   writeRegRF24L01(STATUS, readRegRF24L01(STATUS) | ( 1 << RX_DR));
 }
 
+void setReceivedMsg(uint8_t pipe, uint8_t data){
+  setReceivedMsg(pipe,&data,1);
+}
+
+void setReceivedMsg(uint8_t pipe, uint8_t * buffer, uint8_t len){
+  writeRxPayload(pipe,buffer,len);
+}
+
 void powerUpRF24L01(){
   writeRegRF24L01(CONFIG,0x02);
 }
@@ -151,7 +173,7 @@ void setRxAddress(uint8_t * addr, uint8_t len){
   writeRegRF24L01(RX_ADDR_P5,addr[len-1] + 5);
 }
 
-uint8_t HasRxData(){
+uint8_t HasReceiveData(){
   uint8_t status = getStatus();
   return ((status >> RX_P_NO) & 0x7) != 0x7;
 }

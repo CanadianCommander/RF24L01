@@ -5,6 +5,8 @@ AVR_TOOLS_DIR = /usr/local
 MONITOR_PORT = /dev/cu.usbmodem14311
 CXXFLAGS += -I ../../
 USER_LIB_PATH := ../../../
+CXXFLAGS_STD = -std=gnu++11
+CFLAGS_STD = -std=gnu11
 
 ARDUINO_LIBS = RF24L01_Library
 BOARD_TAG     = uno
