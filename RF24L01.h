@@ -44,6 +44,28 @@ namespace RF24L01 {
   //NOTE when setting a pipe other than pipe 0 you can only set the LSBit of the address (len must == 1)
   extern bool setReceiveAddress(uint8_t pipe, uint8_t * addr, uint8_t len);
   extern bool setChannel(uint8_t channel);
+  // rTime is 4 bit!
+  // setps of 250 nano seconds starting at 250.
+  // 0000 = disabled (in most cases wont work due to 2.4 Ghz clutter)
+  // 0001 = 250 <-- most likely will not work due to packet size / addr size
+  // 0010 = 500 <-- just set this one and up!
+  //...........
+  // 1111 = 4000
+  extern bool setRetransmitTime(uint8_t rTime);
+  // rCount is 4 bit !
+  extern bool setRetransmitCount(uint8_t rCount);
+  // dRate
+  // 0 = 1 Mbps
+  // 1 = 2 Mbps <- fast
+  // 2 = 250 kbps <- long range
+  // note retransmission time must be > 500 nano sec for 1 or 2 Mbps transmission rate.
+  extern bool setDataRate(uint8_t dRate);
+  // tPow
+  // 0 = -18 dBm <- low
+  // 1 = -12 dBm
+  // 2 = -6  dBm
+  // 3 = 0   dBm <- high
+  extern bool setTransmitPower(uint8_t tPow);
 
   extern bool transmitMsg(uint8_t data);
   extern bool transmitMsg(uint8_t * data, uint8_t len);

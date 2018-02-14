@@ -11,9 +11,14 @@ uint8_t myAddr[5] = {0xB3,0xB4,0xB5,0xB6,0x06};
 void setup(){
   Serial.begin(9600);
   Serial.print("INIT....");
+
   initRF24L01();
   setTransmitAddress(myAddr,5);
+
   setChannel(2);
+  setDataRate(2);//250 kbs
+  setRetransmitTime(2);// 500 nano
+
   Serial.print("INIT Done\n");
 }
 

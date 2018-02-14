@@ -215,6 +215,52 @@ bool RF24L01::setChannel(uint8_t channel){
   }
 }
 
+bool RF24L01::setRetransmitTime(uint8_t rTime){
+  if(rTime < 0x10){
+    writeRegRF24L01(SETUP_RETR, (readRegRF24L01(SETUP_RETR) & 0x0F) | (rTime << ARDa));
+    return true;
+  }
+  else{
+    return false;
+  }
+}
+
+bool RF24L01::setRetransmitCount(uint8_t rCount){
+  if(rCount < 0x10){
+    writeRegRF24L01(SETUP_RETR, (readRegRF24L01(SETUP_RETR) & 0xF0) | rCount);
+    return true;
+  }
+  else{
+    return false;
+  }
+}
+
+bool RF24L01::setDataRate(uint8_t dRate){
+  switch (dRate){
+    case 0:
+      writeRegRF24L01(RF_SETUP, (readRegRF24L01(RF_SETUP) & 0xD7));
+      return true;
+    case 1:
+      writeRegRF24L01(RF_SETUP, (readRegRF24L01(RF_SETUP) & 0xDF) | (1 << RF_DR_HIGH));
+      return true;
+    case 2:
+      writeRegRF24L01(RF_SETUP, (readRegRF24L01(RF_SETUP) & 0xF7) | (1 << RF_DR_LOW));
+      return true;
+    default:
+      return false;
+  }
+}
+
+bool RF24L01::setTransmitPower(uint8_t tPow){
+  if(tPow < 4){
+    writeRegRF24L01(RF_SETUP, (readRegRF24L01(RF_SETUP) & 0xF9) | tPow);
+    return true;
+  }
+  else{
+    return false;
+  }
+}
+
 uint8_t RF24L01::HasReceiveData(){
   uint8_t status = getStatus();
   return ((status >> RX_P_NO) & 0x7) != 0x7;

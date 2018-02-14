@@ -11,18 +11,21 @@ uint8_t myAddr[5] = {0xB3,0xB4,0xB5,0xB6,0x06};
 void setup(){
   Serial.begin(9600);
   Serial.print("INIT....");
-  initSPI();
+
   initRF24L01();
   setReceiveAddress(RX_ADDR_P0,myAddr, 5);
   configureAsReceiver();
+
   setChannel(2);
+  setDataRate(2);//250 kbs
+  setRetransmitTime(2);// 500 nano
+
   Serial.print("INIT Done\n");
 }
 
 uint8_t dataBuff[33];
 void loop(){
   delay(1000);
-  delay(1);
   if(HasReceiveData()){
     setResponseMsg(0,(uint8_t*)"YO!",4);
     Serial.print("I have mail: ");
