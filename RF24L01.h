@@ -18,38 +18,43 @@ extern uint8_t transmitSPI(uint8_t msg);
 #define CSN_PIN PORTB2
 #endif
 
+namespace RF24L01 {
 
+  extern void initRF24L01();
+  extern void configureAsReceiver();
+  extern uint8_t writeRegRF24L01(uint8_t addr, uint8_t reg);
+  extern uint8_t writeRegRF24L01(uint8_t addr, uint8_t * data, uint8_t len);
+  extern uint8_t writeTxPayload(uint8_t data);
+  extern uint8_t writeTxPayload(uint8_t * data, uint8_t len);
+  extern uint8_t writeRxPayload(uint8_t pipe, uint8_t data);
+  extern uint8_t writeRxPayload(uint8_t pipe, uint8_t * data, uint8_t len);
 
-void initRF24L01();
-void configRX();
-extern uint8_t writeRegRF24L01(uint8_t addr, uint8_t reg);
-extern uint8_t writeRegRF24L01(uint8_t addr, uint8_t * data, uint8_t len);
-extern uint8_t writeTxPayload(uint8_t data);
-extern uint8_t writeTxPayload(uint8_t * data, uint8_t len);
-extern uint8_t writeRxPayload(uint8_t pipe, uint8_t data);
-extern uint8_t writeRxPayload(uint8_t pipe, uint8_t * data, uint8_t len);
+  extern uint8_t readRegRF24L01(uint8_t addr);
+  extern uint8_t readRxPayload(uint8_t * buffer, uint8_t len);
 
-extern uint8_t readRegRF24L01(uint8_t addr);
-extern uint8_t readRxPayload(uint8_t * buffer, uint8_t len);
+  extern uint8_t getStatus();
+  extern uint8_t flushRreceiveBuffer();
+  extern uint8_t flushTransmitBuffer();
 
-extern uint8_t getStatus();
-extern uint8_t flushRx();
+  extern void powerUp();
+  extern void powerDown();
 
-extern void powerUpRF24L01();
+  extern bool setTransmitAddress(uint8_t * addr, uint8_t len);
+  extern bool setReceiveAddress(uint8_t * addr, uint8_t len);
+  //NOTE when setting a pipe other than pipe 0 you can only set the LSBit of the address (len must == 1)
+  extern bool setReceiveAddress(uint8_t pipe, uint8_t * addr, uint8_t len);
+  extern bool setChannel(uint8_t channel);
 
-extern void setTxAddress(uint8_t * addr, uint8_t len);
-extern void setRxAddress(uint8_t * addr, uint8_t len);
+  extern bool transmitMsg(uint8_t data);
+  extern bool transmitMsg(uint8_t * data, uint8_t len);
 
-extern void transmitRF24L01(uint8_t data);
-extern void transmitRF24L01(uint8_t * data, uint8_t len);
+  extern void getReceivedMsg(uint8_t * buffer, uint8_t len);
+  extern void setResponseMsg(uint8_t pipe, uint8_t data);
+  extern void setResponseMsg(uint8_t pipe, uint8_t * buffer, uint8_t len);
 
-extern void receiveRF24L01(uint8_t * buffer, uint8_t len);
-extern void setReceivedMsg(uint8_t pipe, uint8_t data);
-extern void setReceivedMsg(uint8_t pipe, uint8_t * buffer, uint8_t len);
-
-extern uint8_t HasReceiveData();
-extern void listenForTransmission();
-extern void printStatus(uint8_t sReg);
+  extern uint8_t HasReceiveData();
+  extern void listenForTransmission();
+}
 /////////////////////////////////
 
 //commands
@@ -59,6 +64,7 @@ extern void printStatus(uint8_t sReg);
 #define W_TX_PAYLOAD 0xA0
 #define W_ACK_PAYLOAD(pipe) (pipe & 0x7) | 0xA8
 #define FLUSH_RX     0xE2
+#define FLUSH_TX     0xE1
 #define NOP          0xFF
 
 //register defines

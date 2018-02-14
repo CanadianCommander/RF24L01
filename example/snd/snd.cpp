@@ -3,25 +3,26 @@
 #define CE_PIN PORTB1
 #define CSN_PIN PORTB2
 #include "RF24L01.h"
+using namespace RF24L01;
 
 void printStatus(uint8_t sReg);
 
-uint8_t myAddr[5] = {0xB3,0xB4,0xB5,0xB6,0x05};
+uint8_t myAddr[5] = {0xB3,0xB4,0xB5,0xB6,0x06};
 void setup(){
   Serial.begin(9600);
   Serial.print("INIT....");
-  initSPI();
   initRF24L01();
-  setTxAddress(myAddr,5);
+  setTransmitAddress(myAddr,5);
+  setChannel(2);
   Serial.print("INIT Done\n");
 }
 
 uint8_t dataBuff[33];
 void loop(){
   delay(1000);
-  transmitRF24L01((uint8_t*)"HELLO WORLD", 12);
+  transmitMsg((uint8_t*)"HELLO WORLD", 12);
   if(HasReceiveData()){
-    receiveRF24L01(dataBuff,32);
+    getReceivedMsg(dataBuff,32);
     Serial.print((char*)dataBuff);
     Serial.print("\n");
   }
