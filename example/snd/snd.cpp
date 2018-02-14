@@ -26,7 +26,7 @@ uint8_t dataBuff[33];
 void loop(){
   delay(1000);
   transmitMsg((uint8_t*)"HELLO WORLD", 12);
-  if(HasReceiveData()){
+  if(hasReceiveData()){
     getReceivedMsg(dataBuff,32);
     Serial.print((char*)dataBuff);
     Serial.print("\n");

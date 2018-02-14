@@ -20,14 +20,16 @@ uint8_t transmitSPI(uint8_t msg){
 
 void RF24L01::initRF24L01(){
   initSPI();
-  //PORTB1/2 to output. B1 is CE and B2 is CSN.
+  //PORTB CE and CSN to output.
   DDRB |= (1 << CE_PIN) | (1 << CSN_PIN);
   PORTB |= (1 << CSN_PIN);
   PORTB &= ~(1 << CE_PIN);
 
   powerUp();
+  //enable all features
   writeRegRF24L01(FEATURE,(1 << EN_DPL) | (1 << EN_ACK_PAY) | (1 << EN_DYN_ACK));
   writeRegRF24L01(DYNPD,(1 << DPL_P5) | (1 << DPL_P4) | (1 << DPL_P3) | (1 << DPL_P2) | (1 << DPL_P1) | (1 << DPL_P0));
+  //max retransmit delay and max retransmit count.
   writeRegRF24L01(SETUP_RETR, (0xF << ARDa) | (0xF << ARC));
   setChannel(1);
 }
@@ -261,7 +263,7 @@ bool RF24L01::setTransmitPower(uint8_t tPow){
   }
 }
 
-uint8_t RF24L01::HasReceiveData(){
+bool RF24L01::hasReceiveData(){
   uint8_t status = getStatus();
   return ((status >> RX_P_NO) & 0x7) != 0x7;
 }

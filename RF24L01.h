@@ -1,12 +1,11 @@
+/** \mainpage
+  documentation here: RF24L01
+*/
 #ifndef RF24L01_H
 #define RF24L01_H
 
 #include <Arduino.h>
 
-//SPI ----------------------------
-extern void initSPI();
-extern uint8_t transmitSPI(uint8_t msg);
-//////////////////////////////////
 // RF24L01 ----------------------
 #ifndef CE_PIN
 #warning "CE Pin not defined defaulting to .... PORTB1"
@@ -18,10 +17,24 @@ extern uint8_t transmitSPI(uint8_t msg);
 #define CSN_PIN PORTB2
 #endif
 
+/**
+  primary namespace for the RF24L01 Library
+*/
 namespace RF24L01 {
 
+  /**
+    initialize the RF24L01 radio. The randio must be connected to the SPI pins of your board
+    and, CSN_PIN + CE_PIN must be set.
+  */
   extern void initRF24L01();
+  /**
+    configure the RF24L01 radio as a "Primary Receiver". This means that you can
+    only "talk" when spoken to. Think of it like SPI. you will use  setResponseMsg() to send these messages
+    @see setResponseMsg
+  */
   extern void configureAsReceiver();
+
+  //low level stuff
   extern uint8_t writeRegRF24L01(uint8_t addr, uint8_t reg);
   extern uint8_t writeRegRF24L01(uint8_t addr, uint8_t * data, uint8_t len);
   extern uint8_t writeTxPayload(uint8_t data);
@@ -32,49 +45,171 @@ namespace RF24L01 {
   extern uint8_t readRegRF24L01(uint8_t addr);
   extern uint8_t readRxPayload(uint8_t * buffer, uint8_t len);
 
+  /**
+    get the RF24L01 STATUS register
+    @returns STATUS register 0-7 bit [TX_FULL,RX_P_NO,RX_P_NO,RX_P_NO,MAX_RT,TX_DS,RX_DR,Reserved]
+    TX_FULL is set when the tx buffer is full. RX_P_NO is the Rx pipe number on which the next call to
+    getReceiveMsg will return data from (handy for multi per communication). MAX_RT indicates a transmission timeout
+    this flag is cleared by transmitMsg for you, said call will return false instead. TX_DS indicates that
+    the transmission was successfull, again transmitMsg will handle it for you. RX_DR indicates that there is
+    Rx FIFO data ready to be read.
+  */
   extern uint8_t getStatus();
+  /**
+    flush the Rx FIFO. handy if its cloged up with a bunch of shit.
+    @return STATUS register
+    @see getStatus
+  */
   extern uint8_t flushRreceiveBuffer();
+  /**
+    flush the Tx FIFO. handy if its cloged up with a bunch of shit.
+    @return STATUS register
+    @see getStatus
+  */
   extern uint8_t flushTransmitBuffer();
 
+  /**
+    power up the RF24L01 module
+  */
   extern void powerUp();
+  /**
+    power down the RF24L01 module (to save power ofc)
+  */
   extern void powerDown();
 
+  /**
+    set the address to which you will transmit. NOTE, will overwrite RX_ADDR_P0 for ack message handling.
+    so just keep that in mind if you plan to use it latter.
+    @param addr the address to which transmissions are sent
+    @param len the length of the address < 5 bytes
+    @return ture on success
+  */
   extern bool setTransmitAddress(uint8_t * addr, uint8_t len);
+
+  /**
+    set the address of a pipe0-5. the transmiter must target this address for message transmission to work.
+    pipe zero is set to addr, RX_ADDR_P1 - RX_ADDR_P5 are set to increments of RX_ADDR_P0
+    @param addr address of pipe 0
+    @param len length of the address < 5 bytes
+    @return true on success
+  */
   extern bool setReceiveAddress(uint8_t * addr, uint8_t len);
-  //NOTE when setting a pipe other than pipe 0 you can only set the LSBit of the address (len must == 1)
+
+  /**
+    set the address of a pipe. the transmiter must target this address for message transmission to work.
+    @param pipe (RX_ADDR_P0 - RX_ADDR_P5) NOTE, when setting a pipe other than pipe 0 you can only set the LSBit of the address (len must == 1)
+    @param addr address
+    @param len length of address < 5 bytes
+    @return true on succes
+  */
   extern bool setReceiveAddress(uint8_t pipe, uint8_t * addr, uint8_t len);
+  /**
+    set transmission channel. NOTE, if in 2Mbps mode (the default) you should leave a 1 channel gap between
+    channels in multi transmiter scenarios.
+    @param channel 0 - 128 channel select.
+    @return true on success
+  */
   extern bool setChannel(uint8_t channel);
-  // rTime is 4 bit!
-  // setps of 250 nano seconds starting at 250.
-  // 0000 = disabled (in most cases wont work due to 2.4 Ghz clutter)
-  // 0001 = 250 <-- most likely will not work due to packet size / addr size
-  // 0010 = 500 <-- just set this one and up!
-  //...........
-  // 1111 = 4000
+  /**
+  set the amount of delay before a packet is retransmited
+  @param rTime
+  setps of 250 nano seconds starting at:
+  0000 = disabled,
+  0001 = 250 (in most cases wont work due to 2.4 Ghz clutter)
+  0010 = 500
+  ...........
+   1111 = 4000
+   @return true on success
+  */
   extern bool setRetransmitTime(uint8_t rTime);
-  // rCount is 4 bit !
+  /**
+    set the number of retransmission before a timeout.
+    @param rCount a number less than 0x10.
+    @return true on success
+    @see transmitMsg
+  */
   extern bool setRetransmitCount(uint8_t rCount);
-  // dRate
-  // 0 = 1 Mbps
-  // 1 = 2 Mbps <- fast
-  // 2 = 250 kbps <- long range
-  // note retransmission time must be > 500 nano sec for 1 or 2 Mbps transmission rate.
+  /**
+    set data rate. must match the data rate of the RF module you are trying to talk to.
+    @param dRate 0 = 1 Mbps, 1 = 2 Mbps, 2 = 250 kbps.
+    @return true on success
+  */
   extern bool setDataRate(uint8_t dRate);
-  // tPow
-  // 0 = -18 dBm <- low
-  // 1 = -12 dBm
-  // 2 = -6  dBm
-  // 3 = 0   dBm <- high
+  /**
+    set transmission power.... POWER!
+    @param tPow: 0 = -18 dBm, 1 = -12 dBm, 2 = -6 dBm, 3 = 0 dBm.
+    @return true on success
+  */
   extern bool setTransmitPower(uint8_t tPow);
 
+  /**
+    transmit a message (Tx FIFO must not be full)
+    @param data a one byte message to transmit
+    @return true if message transmission success, false on timeout.
+    @see setTransmitAddress
+    @see setChannel
+    @see setTransmitPower
+    @see setDataRate
+    @see setRetransmitTime
+    @see setRetransmitCount
+    @see getStatus
+  */
   extern bool transmitMsg(uint8_t data);
+  /**
+    transmit a message (Tx FIFO must not be full)
+    @param data buffer to transmit
+    @param len the length of the data buffer, must not exceed 32 bytes
+    @return true if message transmission success, false on timeout.
+    @see setTransmitAddress
+    @see setChannel
+    @see setTransmitPower
+    @see setDataRate
+    @see setRetransmitTime
+    @see setRetransmitCount
+    @see getStatus
+  */
   extern bool transmitMsg(uint8_t * data, uint8_t len);
 
+  /**
+    read the next received message in the Rx FIFO.
+    @param buffer buffer to receive the data in the Rx FIFO
+    @param len the length of the buffer. bytes are only read up to len.
+           also if len is higher than the amount of data in the Rx FIFO
+           garbage data will be returned and it is up to the programmer to
+           ignore it.
+    @see  hasReceiveData
+  */
   extern void getReceivedMsg(uint8_t * buffer, uint8_t len);
+
+  /**
+    set the message you whish to send in responce to a message from a transmiting RF24L01.
+    This method will return immediately! this does not mean the message was sent!
+    @param pipe the Rx pipe on which to send this message (RX_ADDR_P0 - RX_ADDR_P5)
+    @param data one byte of data to send
+    @see configureAsReceiver
+    @see setResponseMsg
+  */
   extern void setResponseMsg(uint8_t pipe, uint8_t data);
+  /**
+    multi byte version of setResponseMsg.
+    @param pipe the Rx pipe on which to send this message (RX_ADDR_P0 - RX_ADDR_P5)
+    @param data buffer to send. NOTE: must not exceed 32 bytes!
+    @param len the length of the passed buffer
+    @see setResponseMsg
+  */
   extern void setResponseMsg(uint8_t pipe, uint8_t * buffer, uint8_t len);
 
-  extern uint8_t HasReceiveData();
+  /**
+    check if there is pending data in the Rx FIFO
+    @return true if there is data in the Rx FIFO.
+    @see getReceivedMsg
+  */
+  extern bool hasReceiveData();
+
+  /**
+    start activly listening for a transmision on all pipes
+    @see setReceiveAddress
+  */
   extern void listenForTransmission();
 }
 /////////////////////////////////

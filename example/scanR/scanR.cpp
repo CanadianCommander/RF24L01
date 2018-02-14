@@ -17,7 +17,7 @@ void setup(){
   setTransmitAddress(myAddr,5);
 
   setChannel(2);
-  
+
   Serial.print("INIT Done\n");
 
   for(;;){
@@ -46,7 +46,7 @@ void loop(){
 
   delay(1000);
   transmitMsg((uint8_t*)"HELLO WORLD", 12);
-  if(HasReceiveData()){
+  if(hasReceiveData()){
     getReceivedMsg(dataBuff,32);
     Serial.print((char*)dataBuff);
     Serial.print("\n");

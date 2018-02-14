@@ -26,7 +26,7 @@ void setup(){
 uint8_t dataBuff[33];
 void loop(){
   delay(1000);
-  if(HasReceiveData()){
+  if(hasReceiveData()){
     setResponseMsg(0,(uint8_t*)"YO!",4);
     Serial.print("I have mail: ");
     getReceivedMsg(dataBuff,33);
