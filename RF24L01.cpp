@@ -161,6 +161,10 @@ void RF24L01::getReceivedMsg(uint8_t * buffer, uint8_t len){
   writeRegRF24L01(STATUS, readRegRF24L01(STATUS) | ( 1 << RX_DR));
 }
 
+uint8_t RF24L01::getReceivePipe(){
+  return ((getStatus() >> RX_P_NO) & 0xF8);
+}
+
 void RF24L01::setResponseMsg(uint8_t pipe, uint8_t data){
   setResponseMsg(pipe,&data,1);
 }

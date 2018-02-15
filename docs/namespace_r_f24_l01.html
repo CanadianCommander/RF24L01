@@ -132,6 +132,8 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>readRxPayload</b> 
 <tr class="separator:a97c2db2a1a441dc1de88f1583861e622"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af736b8bca2870b8cbf49fda37e1b2b7c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_r_f24_l01.html#af736b8bca2870b8cbf49fda37e1b2b7c">getReceivedMsg</a> (uint8_t *buffer, uint8_t len)</td></tr>
 <tr class="separator:af736b8bca2870b8cbf49fda37e1b2b7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae07ca00b5840bc6c0325aaeb3253a24e"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_r_f24_l01.html#ae07ca00b5840bc6c0325aaeb3253a24e">getReceivePipe</a> ()</td></tr>
+<tr class="separator:ae07ca00b5840bc6c0325aaeb3253a24e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a909555c7340573af8f698610b9cfe497"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_r_f24_l01.html#a909555c7340573af8f698610b9cfe497">setResponseMsg</a> (uint8_t pipe, uint8_t data)</td></tr>
 <tr class="separator:a909555c7340573af8f698610b9cfe497"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a19a402017e07bee1a0191e5cff84f1ca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_r_f24_l01.html#a19a402017e07bee1a0191e5cff84f1ca">setResponseMsg</a> (uint8_t pipe, uint8_t *buffer, uint8_t len)</td></tr>
@@ -233,6 +235,24 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>readRxPayload</b> 
   </dd>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_r_f24_l01.html#ac87aab075d5fd63ba4cd99daa1b34d33">hasReceiveData</a> </dd></dl>
+
+</div>
+</div>
+<a id="ae07ca00b5840bc6c0325aaeb3253a24e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae07ca00b5840bc6c0325aaeb3253a24e">&#9670;&nbsp;</a></span>getReceivePipe()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t RF24L01::getReceivePipe </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>get the pipe number 0 - 5 of the Rx pipe that holds the data to be read on the next call to getReceivedMsg. Handy when talking to multiple people. </p><dl class="section return"><dt>Returns</dt><dd>number of pipe with data in it. </dd></dl>
 
 </div>
 </div>

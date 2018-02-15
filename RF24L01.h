@@ -182,6 +182,13 @@ namespace RF24L01 {
   extern void getReceivedMsg(uint8_t * buffer, uint8_t len);
 
   /**
+    get the pipe number 0 - 5 of the Rx pipe that holds the data to be read on the next call
+    to getReceivedMsg. Handy when talking to multiple people.
+    @return number of pipe with data in it.
+  */
+  extern uint8_t getReceivePipe();
+
+  /**
     set the message you whish to send in responce to a message from a transmiting RF24L01.
     This method will return immediately! this does not mean the message was sent!
     @param pipe the Rx pipe on which to send this message (RX_ADDR_P0 - RX_ADDR_P5)
