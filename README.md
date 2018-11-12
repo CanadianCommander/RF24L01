@@ -5,38 +5,52 @@ this library allows light weight & easy control of the RF24L01 from any Arduino 
 see [docs](https://canadiancommander.github.io/RF24L01/)
 ### Install
 simple, just copy N paste the library folder in to where ever you store all your other Arduino libraries.
-for the Arduino IDE this is most likely under: $HOME/Documents/Arduino/libraries/
+for the Arduino IDE this is most likely under: $HOME/Documents/Arduino/libraries/ or /usr/share/arduino/libraries
 ### examples
 full examples in example folder.
 
 Sender:
 ```
 void setup(){
+  Serial.begin(9600);
+
   initRF24L01();
-  setTransmitAddress(rcvAddr,5);
+  setTransmitAddress(myAddr,5);
+
+  setChannel(2);
+  setDataRate(1);//2 Mbps
+  setRetransmitTime(0xF);// 4000 nano
 }
 
-//transmit hello world every second.
+uint8_t dataBuff[33];
 void loop(){
-  transmitMsg((uint8_t*)"HELLO WORLD", 12);
   delay(1000);
+  transmitMsg((uint8_t*)"HELLO WORLD", 12);
 }
 ```
 Receiver:
 ```
 void setup(){
+  Serial.begin(9600);
+
   initRF24L01();
-  setReceiveAddress(rcvAddr, 5);
+  setReceiveAddress(myAddr, 5);
   configureAsReceiver();
+
+  setChannel(2);
+  setDataRate(1);// 2 Mbps
+  setRetransmitTime(0xF);// 4000 nano
 }
 
-//wait for msg
+uint8_t dataBuff[33];
 void loop(){
   delay(1000);
   if(hasReceiveData()){
     getReceivedMsg(dataBuff,33);
+    Serial.print("I have mail: ");
     Serial.print((char*)dataBuff);
+    Serial.print("\n");
   }
 }
 ```
-and its just that easy! 
+and its just that easy!

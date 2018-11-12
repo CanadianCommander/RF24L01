@@ -36,7 +36,7 @@ void RF24L01::initRF24L01(){
 
 void RF24L01::configureAsReceiver(){
   writeRegRF24L01(EN_RXADDR, (1 << ERX_P5) | (1 << ERX_P4) | (1 << ERX_P3) | (1 << ERX_P2) | (1 << ERX_P1) | (1 << ERX_P0));
-  writeRegRF24L01(EN_AA, 0x1F);
+  writeRegRF24L01(EN_AA, 0x3F);
   listenForTransmission();
 }
 
@@ -113,7 +113,7 @@ uint8_t RF24L01::getStatus(){
 }
 
 
-uint8_t RF24L01::flushRreceiveBuffer(){
+uint8_t RF24L01::flushReceiveBuffer(){
   PORTB &= ~(1 << CSN_PIN);
   uint8_t status = transmitSPI(FLUSH_RX);
   PORTB |= (1 << CSN_PIN);
@@ -143,6 +143,7 @@ bool RF24L01::transmitMsg(uint8_t * data, uint8_t len){
   //wait for transmit finish
   while(((getStatus() >> TX_DS) & 0x1) != 0x1){
     if(((getStatus() >> MAX_RT) & 0x1) == 0x1){
+      flushTransmitBuffer();
       transmitSuccess = false;
       break;
     }
@@ -269,7 +270,7 @@ bool RF24L01::setTransmitPower(uint8_t tPow){
 
 bool RF24L01::hasReceiveData(){
   uint8_t status = getStatus();
-  return ((status >> RX_P_NO) & 0x7) != 0x7;
+  return ((status >> RX_DR));
 }
 
 void RF24L01::listenForTransmission(){

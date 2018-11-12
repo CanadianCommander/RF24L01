@@ -23,7 +23,7 @@
 namespace RF24L01 {
 
   /**
-    initialize the RF24L01 radio. The randio must be connected to the SPI pins of your board
+    initialize the RF24L01 radio. The radio must be connected to the SPI pins of your board
     and, CSN_PIN + CE_PIN must be set.
   */
   extern void initRF24L01();
@@ -51,18 +51,18 @@ namespace RF24L01 {
     TX_FULL is set when the tx buffer is full. RX_P_NO is the Rx pipe number on which the next call to
     getReceiveMsg will return data from (handy for multi per communication). MAX_RT indicates a transmission timeout
     this flag is cleared by transmitMsg for you, said call will return false instead. TX_DS indicates that
-    the transmission was successfull, again transmitMsg will handle it for you. RX_DR indicates that there is
+    the transmission was success full, again transmitMsg will handle it for you. RX_DR indicates that there is
     Rx FIFO data ready to be read.
   */
   extern uint8_t getStatus();
   /**
-    flush the Rx FIFO. handy if its cloged up with a bunch of shit.
+    flush the Rx FIFO. handy if its clogged up with a bunch of shit.
     @return STATUS register
     @see getStatus
   */
-  extern uint8_t flushRreceiveBuffer();
+  extern uint8_t flushReceiveBuffer();
   /**
-    flush the Tx FIFO. handy if its cloged up with a bunch of shit.
+    flush the Tx FIFO. handy if its clogged up with a bunch of shit.
     @return STATUS register
     @see getStatus
   */

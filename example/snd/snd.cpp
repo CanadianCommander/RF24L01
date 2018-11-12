@@ -7,7 +7,7 @@ using namespace RF24L01;
 
 void printStatus(uint8_t sReg);
 
-uint8_t myAddr[5] = {0xB3,0xB4,0xB5,0xB6,0x06};
+uint8_t myAddr[5] = {0xB3,0xB4,0xB5,0xB6,0xC6};
 void setup(){
   Serial.begin(9600);
   Serial.print("INIT....");
@@ -16,8 +16,8 @@ void setup(){
   setTransmitAddress(myAddr,5);
 
   setChannel(2);
-  setDataRate(2);//250 kbs
-  setRetransmitTime(2);// 500 nano
+  setDataRate(1);//2 Mbps
+  setRetransmitTime(0xF);// 4000 nano
 
   Serial.print("INIT Done\n");
 }
@@ -26,11 +26,6 @@ uint8_t dataBuff[33];
 void loop(){
   delay(1000);
   transmitMsg((uint8_t*)"HELLO WORLD", 12);
-  if(hasReceiveData()){
-    getReceivedMsg(dataBuff,32);
-    Serial.print((char*)dataBuff);
-    Serial.print("\n");
-  }
   printStatus(getStatus());
 }
 
