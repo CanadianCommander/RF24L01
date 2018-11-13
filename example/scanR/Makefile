@@ -1,18 +1,18 @@
-ARDUINO_DIR   = /Applications/Arduino.app/Contents/Java
-ARDMK_DIR     = /usr/local/Cellar/arduino-mk/1.5.2/
-AVR_TOOLS_DIR = /usr/local
-MONITOR_PORT  = /dev/cu.wchusbserial14110    #FOR NANO
-#MONITOR_PORT = /dev/cu.usbmodem14311
-CXXFLAGS += -I ../../
-USER_LIB_PATH := ../../../
+ARDUINO_DIR = /usr/share/arduino
+ARDMK_DIR = /usr/share/arduino
+
+# Arduino Uno
+BOARD_TAG = uno
+
+# Arduino Nano
+#BOARD_TAG = nano328
+
+# most likely different on your machine
+MONITOR_PORT = /dev/ttyACM0
+
 CXXFLAGS_STD = -std=gnu++11
 CFLAGS_STD = -std=gnu11
 
-ARDUINO_LIBS = RF24L01_Library
-#BOARD_TAG     = uno
-BOARD_TAG    = nano
-BOARD_SUB			= atmega328
-MCU = atmega328p
-F_CPU = 16000000UL
+ARDUINO_LIBS = RF24L01
 
-include $(ARDMK_DIR)/Arduino.mk
+include ${ARDMK_DIR}/Arduino.mk

@@ -1,5 +1,3 @@
-#define CE_PIN PORTB1
-#define CSN_PIN PORTB2
 #include "RF24L01.h"
 using namespace RF24L01;
 
@@ -26,18 +24,30 @@ void RF24L01::initRF24L01(){
   PORTB &= ~(1 << CE_PIN);
 
   powerUp();
-  //enable all features
+  // enable all features
   writeRegRF24L01(FEATURE,(1 << EN_DPL) | (1 << EN_ACK_PAY) );
+  // auto ack on all pipes
+  writeRegRF24L01(EN_AA, 0x3F);
+  // enable dynamic payload length on all pipes
   writeRegRF24L01(DYNPD,(1 << DPL_P5) | (1 << DPL_P4) | (1 << DPL_P3) | (1 << DPL_P2) | (1 << DPL_P1) | (1 << DPL_P0));
-  //max retransmit delay and max retransmit count.
+  // max retransmit delay and max retransmit count.
   writeRegRF24L01(SETUP_RETR, (0xF << ARDa) | (0xF << ARC));
+  // channel 1
   setChannel(1);
+  // disable all pipes
+  for (int i =0; i < 6; i++){
+    disablePipe(i);
+  }
 }
 
-void RF24L01::configureAsReceiver(){
-  writeRegRF24L01(EN_RXADDR, (1 << ERX_P5) | (1 << ERX_P4) | (1 << ERX_P3) | (1 << ERX_P2) | (1 << ERX_P1) | (1 << ERX_P0));
-  writeRegRF24L01(EN_AA, 0x3F);
-  listenForTransmission();
+void RF24L01::enablePipe (uint8_t pipe) {
+  uint8_t pipeBit = ERX_P0 + pipe;
+  writeRegRF24L01(EN_RXADDR, readRegRF24L01(EN_RXADDR) | (1 << pipeBit));
+}
+
+void RF24L01::disablePipe (uint8_t pipe) {
+  uint8_t pipeBit = ERX_P0 + pipe;
+  writeRegRF24L01(EN_RXADDR, readRegRF24L01(EN_RXADDR) & ~(1 << pipeBit));
 }
 
 uint8_t RF24L01::writeRegRF24L01(uint8_t addr, uint8_t reg){
@@ -184,12 +194,10 @@ void RF24L01::powerDown(){
 
 bool RF24L01::setTransmitAddress(uint8_t * addr, uint8_t len){
   writeRegRF24L01(TX_ADDR,addr,len);// transmit target
-  writeRegRF24L01(EN_RXADDR, readRegRF24L01(EN_RXADDR) | (1 << ERX_P0));
-  writeRegRF24L01(RX_ADDR_P0,addr,len);//rcv ack on pipe 0.
   return true;
 }
 
-bool RF24L01::setReceiveAddress(uint8_t * addr, uint8_t len){
+bool RF24L01::setPipeAddresses(uint8_t * addr, uint8_t len){
   writeRegRF24L01(RX_ADDR_P0,addr,len);
   writeRegRF24L01(RX_ADDR_P1,addr[0] + 1);
   writeRegRF24L01(RX_ADDR_P2,addr[0] + 2);
@@ -199,13 +207,13 @@ bool RF24L01::setReceiveAddress(uint8_t * addr, uint8_t len){
   return true;
 }
 
-bool RF24L01::setReceiveAddress(uint8_t pipe, uint8_t * addr, uint8_t len){
+bool RF24L01::setPipeAddress(uint8_t pipe, uint8_t * addr, uint8_t len){
   uint8_t reg = RX_ADDR_P0 + pipe;
-  if(reg == RX_ADDR_P0){
+  if(reg == RX_ADDR_P0 || reg == RX_ADDR_P1){
     writeRegRF24L01(reg,addr,len);
     return true;
   }
-  else if(reg >= RX_ADDR_P1 && reg <= RX_ADDR_P5){
+  else if(reg >= RX_ADDR_P2 && reg <= RX_ADDR_P5){
     if(len == 1){
       writeRegRF24L01(reg,addr,len);
       return true;
@@ -278,4 +286,8 @@ bool RF24L01::hasReceiveData(){
 void RF24L01::listenForTransmission(){
   writeRegRF24L01(CONFIG, 0xB);
   PORTB |= (1 << CE_PIN);
+}
+
+void RF24L01::stopListening() {
+  PORTB &= ~(1 << CE_PIN);
 }

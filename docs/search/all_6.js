@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['powerdown',['powerDown',['../namespace_r_f24_l01.html#af818d0549c5506ee31b7807dd0ed8e79',1,'RF24L01']]],
-  ['powerup',['powerUp',['../namespace_r_f24_l01.html#ac3b11b901e092083b61cc98724a504b6',1,'RF24L01']]]
+  ['listenfortransmission',['listenForTransmission',['../namespace_r_f24_l01.html#a67f6d1410d0de10ae0f6e9a5a8c58760',1,'RF24L01']]]
 ];

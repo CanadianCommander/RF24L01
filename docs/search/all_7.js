@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['rf24l01_20library_2e',['RF24L01 library.',['../md__r_e_a_d_m_e.html',1,'']]],
-  ['rf24l01',['RF24L01',['../namespace_r_f24_l01.html',1,'']]]
+  ['powerdown',['powerDown',['../namespace_r_f24_l01.html#af818d0549c5506ee31b7807dd0ed8e79',1,'RF24L01']]],
+  ['powerup',['powerUp',['../namespace_r_f24_l01.html#ac3b11b901e092083b61cc98724a504b6',1,'RF24L01']]]
 ];

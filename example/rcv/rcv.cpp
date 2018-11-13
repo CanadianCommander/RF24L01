@@ -13,13 +13,15 @@ void setup(){
   Serial.print("INIT....");
 
   initRF24L01();
-  setReceiveAddress(myAddr, 5);
-  configureAsReceiver();
+
+  setPipeAddress(0, myAddr, 5);
+  enablePipe(0);
 
   setChannel(2);
   setDataRate(1);// 2 Mbps
   setRetransmitTime(0xF);// 4000 nano
 
+  listenForTransmission();
   Serial.print("INIT Done\n");
 }
 

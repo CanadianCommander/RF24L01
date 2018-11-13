@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['initrf24l01',['initRF24L01',['../namespace_r_f24_l01.html#ad724bae93ed3edb7ba1c151d4bdf9f49',1,'RF24L01']]]
+  ['hasreceivedata',['hasReceiveData',['../namespace_r_f24_l01.html#ac87aab075d5fd63ba4cd99daa1b34d33',1,'RF24L01']]]
 ];

@@ -27,12 +27,20 @@ namespace RF24L01 {
     and, CSN_PIN + CE_PIN must be set.
   */
   extern void initRF24L01();
+
   /**
-    configure the RF24L01 radio as a "Primary Receiver". This means that you can
-    only "talk" when spoken to. Think of it like SPI. you will use  setResponseMsg() to send these messages
-    @see setResponseMsg
+    Enable pipe to receive messagges.
+    @param pipe the pipe to enable, [0 - 5]
+    @see disablePipe
   */
-  extern void configureAsReceiver();
+  extern void enablePipe(uint8_t pipe);
+
+  /**
+    Disable pipe. It will no longer receive messages
+    @param pipe the pipe to disable, [0 - 5]
+    @see enablePipe
+  */
+  extern void disablePipe(uint8_t pipe);
 
   //low level stuff
   extern uint8_t writeRegRF24L01(uint8_t addr, uint8_t reg);
@@ -78,8 +86,8 @@ namespace RF24L01 {
   extern void powerDown();
 
   /**
-    set the address to which you will transmit. NOTE, will overwrite RX_ADDR_P0 for ack message handling.
-    so just keep that in mind if you plan to use it latter.
+    set the address to which you will transmit. NOTE, for successful transmission you MUST
+    have a pipe configured with the same address to which you are transmitting to receive ACK packets.
     @param addr the address to which transmissions are sent
     @param len the length of the address < 5 bytes
     @return ture on success
@@ -87,22 +95,22 @@ namespace RF24L01 {
   extern bool setTransmitAddress(uint8_t * addr, uint8_t len);
 
   /**
-    set the address of a pipe0-5. the transmiter must target this address for message transmission to work.
+    set the address of a pipe0-5. the transmitter must target this address for message transmission to work.
     pipe zero is set to addr, RX_ADDR_P1 - RX_ADDR_P5 are set to increments of RX_ADDR_P0
     @param addr address of pipe 0. WARNING, order of bytes: [LSB, .... ,MSB]
     @param len length of the address < 5 bytes
     @return true on success
   */
-  extern bool setReceiveAddress(uint8_t * addr, uint8_t len);
+  extern bool setPipeAddresses(uint8_t * addr, uint8_t len);
 
   /**
-    set the address of a pipe. the transmiter must target this address for message transmission to work.
-    @param pipe (RX_ADDR_P0 - RX_ADDR_P5) NOTE, when setting a pipe other than pipe 0 you can only set the LSBit of the address (len must == 1)
+    set the address of a pipe. the transmitter must target this address for message transmission to work.
+    @param pipe (RX_ADDR_P0 - RX_ADDR_P5) NOTE, when setting a pipe other than pipe 0/1 you can only set the LSBit of the address (len must == 1)
     @param addr address.  WARNING, order of bytes: [LSB, .... ,MSB]
-    @param len length of address < 5 bytes
+    @param len length of address <= 5 bytes
     @return true on succes
   */
-  extern bool setReceiveAddress(uint8_t pipe, uint8_t * addr, uint8_t len);
+  extern bool setPipeAddress(uint8_t pipe, uint8_t * addr, uint8_t len);
   /**
     set transmission channel. NOTE, if in 2Mbps mode (the default) you should leave a 1 channel gap between
     channels in multi transmiter scenarios.
@@ -214,10 +222,16 @@ namespace RF24L01 {
   extern bool hasReceiveData();
 
   /**
-    start activly listening for a transmision on all pipes
-    @see setReceiveAddress
+    start actively listening for a transmission on all pipes
+    @see setPipeAddress
   */
   extern void listenForTransmission();
+
+  /**
+    stop listening for messages on active pipes.
+    @see listenForTransmission
+  */
+  extern void stopListening();
 }
 /////////////////////////////////
 

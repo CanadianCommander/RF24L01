@@ -13,7 +13,10 @@ void setup(){
   Serial.print("INIT....");
 
   initRF24L01();
+
   setTransmitAddress(myAddr,5);
+  setPipeAddress(0, myAddr, 5);
+  enablePipe(0);
 
   setChannel(2);
   setDataRate(1);//2 Mbps

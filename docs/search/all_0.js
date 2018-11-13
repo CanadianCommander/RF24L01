@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['configureasreceiver',['configureAsReceiver',['../namespace_r_f24_l01.html#ac6a39c4cfff9cf552bb772a264cc9a8c',1,'RF24L01']]]
+  ['disablepipe',['disablePipe',['../namespace_r_f24_l01.html#ae1cf5b9c74ac6abb2127a0cfdf6d17a2',1,'RF24L01']]]
 ];

@@ -1,8 +1,8 @@
 var indexSectionsWithContent =
 {
-  0: "cfghilprst",
+  0: "defghilprst",
   1: "r",
-  2: "cfghilpst",
+  2: "defghilpst",
   3: "r"
 };
 

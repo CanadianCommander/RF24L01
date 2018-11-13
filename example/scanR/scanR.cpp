@@ -8,15 +8,20 @@ using namespace RF24L01;
 void printStatus(uint8_t sReg);
 
 uint8_t chan = 4;
-uint8_t myAddr[5] = {0xB3,0xB4,0xB5,0xB6,0x06};
+uint8_t myAddr[5] = {0xB3,0xB4,0xB5,0xB6,0xC6};
 void setup(){
   Serial.begin(9600);
   Serial.print("INIT....");
 
   initRF24L01();
-  setTransmitAddress(myAddr,5);
 
-  setChannel(2);
+  setTransmitAddress(myAddr,5);
+  setPipeAddress(0, myAddr, 5);
+  enablePipe(0);
+
+  setChannel(0);
+  setDataRate(1);//2 Mbps
+  setRetransmitTime(0xF);// 4000 nano
 
   Serial.print("INIT Done\n");
 
