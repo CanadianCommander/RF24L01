@@ -27,7 +27,7 @@ void RF24L01::initRF24L01(){
 
   powerUp();
   //enable all features
-  writeRegRF24L01(FEATURE,(1 << EN_DPL) | (1 << EN_ACK_PAY) | (1 << EN_DYN_ACK));
+  writeRegRF24L01(FEATURE,(1 << EN_DPL) | (1 << EN_ACK_PAY) );
   writeRegRF24L01(DYNPD,(1 << DPL_P5) | (1 << DPL_P4) | (1 << DPL_P3) | (1 << DPL_P2) | (1 << DPL_P1) | (1 << DPL_P0));
   //max retransmit delay and max retransmit count.
   writeRegRF24L01(SETUP_RETR, (0xF << ARDa) | (0xF << ARC));
@@ -184,28 +184,30 @@ void RF24L01::powerDown(){
 
 bool RF24L01::setTransmitAddress(uint8_t * addr, uint8_t len){
   writeRegRF24L01(TX_ADDR,addr,len);// transmit target
+  writeRegRF24L01(EN_RXADDR, readRegRF24L01(EN_RXADDR) | (1 << ERX_P0));
   writeRegRF24L01(RX_ADDR_P0,addr,len);//rcv ack on pipe 0.
   return true;
 }
 
 bool RF24L01::setReceiveAddress(uint8_t * addr, uint8_t len){
   writeRegRF24L01(RX_ADDR_P0,addr,len);
-  writeRegRF24L01(RX_ADDR_P1,addr[len-1] + 1);
-  writeRegRF24L01(RX_ADDR_P2,addr[len-1] + 2);
-  writeRegRF24L01(RX_ADDR_P3,addr[len-1] + 3);
-  writeRegRF24L01(RX_ADDR_P4,addr[len-1] + 4);
-  writeRegRF24L01(RX_ADDR_P5,addr[len-1] + 5);
+  writeRegRF24L01(RX_ADDR_P1,addr[0] + 1);
+  writeRegRF24L01(RX_ADDR_P2,addr[0] + 2);
+  writeRegRF24L01(RX_ADDR_P3,addr[0] + 3);
+  writeRegRF24L01(RX_ADDR_P4,addr[0] + 4);
+  writeRegRF24L01(RX_ADDR_P5,addr[0] + 5);
   return true;
 }
 
 bool RF24L01::setReceiveAddress(uint8_t pipe, uint8_t * addr, uint8_t len){
-  if(pipe == RX_ADDR_P0){
-    writeRegRF24L01(pipe,addr,len);
+  uint8_t reg = RX_ADDR_P0 + pipe;
+  if(reg == RX_ADDR_P0){
+    writeRegRF24L01(reg,addr,len);
     return true;
   }
-  else if(pipe >= RX_ADDR_P1 && pipe <= RX_ADDR_P5){
+  else if(reg >= RX_ADDR_P1 && reg <= RX_ADDR_P5){
     if(len == 1){
-      writeRegRF24L01(pipe,addr,len);
+      writeRegRF24L01(reg,addr,len);
       return true;
     }
   }
@@ -270,7 +272,7 @@ bool RF24L01::setTransmitPower(uint8_t tPow){
 
 bool RF24L01::hasReceiveData(){
   uint8_t status = getStatus();
-  return ((status >> RX_DR));
+  return ((status >> RX_P_NO) & 0x7) != 0x7;
 }
 
 void RF24L01::listenForTransmission(){

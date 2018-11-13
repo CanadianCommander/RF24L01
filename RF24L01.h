@@ -89,7 +89,7 @@ namespace RF24L01 {
   /**
     set the address of a pipe0-5. the transmiter must target this address for message transmission to work.
     pipe zero is set to addr, RX_ADDR_P1 - RX_ADDR_P5 are set to increments of RX_ADDR_P0
-    @param addr address of pipe 0
+    @param addr address of pipe 0. WARNING, order of bytes: [LSB, .... ,MSB]
     @param len length of the address < 5 bytes
     @return true on success
   */
@@ -98,7 +98,7 @@ namespace RF24L01 {
   /**
     set the address of a pipe. the transmiter must target this address for message transmission to work.
     @param pipe (RX_ADDR_P0 - RX_ADDR_P5) NOTE, when setting a pipe other than pipe 0 you can only set the LSBit of the address (len must == 1)
-    @param addr address
+    @param addr address.  WARNING, order of bytes: [LSB, .... ,MSB]
     @param len length of address < 5 bytes
     @return true on succes
   */
