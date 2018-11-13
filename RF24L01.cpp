@@ -248,10 +248,10 @@ bool RF24L01::setDataRate(uint8_t dRate){
       writeRegRF24L01(RF_SETUP, (readRegRF24L01(RF_SETUP) & 0xD7));
       return true;
     case 1:
-      writeRegRF24L01(RF_SETUP, (readRegRF24L01(RF_SETUP) & 0xDF) | (1 << RF_DR_HIGH));
+      writeRegRF24L01(RF_SETUP, (readRegRF24L01(RF_SETUP) & 0xF7) | (1 << RF_DR_HIGH));
       return true;
     case 2:
-      writeRegRF24L01(RF_SETUP, (readRegRF24L01(RF_SETUP) & 0xF7) | (1 << RF_DR_LOW));
+      writeRegRF24L01(RF_SETUP, (readRegRF24L01(RF_SETUP) & 0xDF) | (1 << RF_DR_LOW));
       return true;
     default:
       return false;
