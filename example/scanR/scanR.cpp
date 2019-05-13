@@ -40,7 +40,7 @@ void setup(){
       Serial.print("\n");
     }
     else{
-      Serial.print("FOUND A FREIND!  :3\n");
+      Serial.print("FOUND A FRIEND!  :3\n");
       break;
     }
   }
